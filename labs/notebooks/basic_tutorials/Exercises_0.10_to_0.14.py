@@ -78,15 +78,61 @@ def exercise_0_12():
         
 def exercise_0_13():
     print("Exercise 0.13")
+
+    use_bias = True
+
+    w = np.random.randn(galton_data.shape[1]) # (2,)
+    x = galton_data[:, 0] # (900, )
+    y = galton_data[:, 1] # (900, )
+
+    if use_bias:
+        x = np.vstack([x, np.ones(x.shape[0])]) # (2, 900)
+    else:
+        x = np.vstack([x, np.zeros(x.shape[0])]) # (2, 900)
+
+
+    def get_error(w, x, y):
+        # (2, ) @ (2, 900) - (900, ) -> (900,)
+        return (w @ x - y)**2
+
+    def get_error_grad(w, x, y):
+        # (2, 900) @ (900, ) -> (2, )
+        return 2 * x @ (w @ x - y) / x.shape[1]
+
+    def grad_descent(w, x, y, learning_rate):
+        current_w = w
+        learning_rate = 0.00001
+        max_iterations = 1000
+        THRESHOLD = 1e-4
+
+        pbar = tqdm(total=max_iterations)
+
+        res = []
+        rmses = []
+        for _ in range(max_iterations):
+            current_error = np.mean(get_error(current_w, x, y))
+            rmses.append(current_error)
+
+
+            current_grad = get_error_grad(current_w, x, y)
+            old_w = current_w
+            current_w = current_w - learning_rate * current_grad
+            res.append(current_w)
+            pbar.update(1)
+            if (abs(old_w- current_w)).sum() < THRESHOLD:
+                break
+
+        pbar.close()
+        return current_w, rmses, res
     
-    def error(x: np.array, y: np.array, w: np.array):
-        return (x.T @ w - y)**2
-        
-    def error_grad(x: np.array, y: np.array, w: np.array):
-        return 2 * x @ (x.T @ w - y)
+    final_w, rmses, res = grad_descent(w, x, y, 0.001)
+    print(f"Final w is {final_w}")
+    print(f"RMSEs: {rmses}")
+    #print(f"Res: {res}")
+
 
 if __name__ == "__main__":
     # exercise_0_10()
     # exercise_0_11()
-    
-    exercise_0_12()
+    # exercise_0_12()
+    exercise_0_13()
