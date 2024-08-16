@@ -19,6 +19,7 @@ class MultinomialNaiveBayes(lc.LinearClassifier):
         # n_docs = no. of documents
         # n_words = no. of unique words
         n_docs, n_words = x.shape
+        # each row of x is a counter for the words
 
         # classes = a list of possible classes
         classes = np.unique(y)
@@ -41,6 +42,17 @@ class MultinomialNaiveBayes(lc.LinearClassifier):
 
         # ----------
         # Solution to Exercise 1
+        
+        # set up prior to be (num docs in class 0, num docs in class 1, ...) / number of docs
+        
+        for label_idx, label in enumerate(classes):
+            prior[label_idx] = len([x for x in y if x==label]) / len(y)
+
+        # likelihood is estimate of P(w_j | y_k)
+        # formula: sum_{m in J_k} number of times w_j appears in mth doc / sum_{words} sum_{m in J_k} number of times word appears in in document m
+        
+
+
 
         raise NotImplementedError("Complete Exercise 1")
 
